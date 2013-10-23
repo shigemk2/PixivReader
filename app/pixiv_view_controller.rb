@@ -5,15 +5,23 @@ class PixivViewController < UITableViewController
 
     @feed = nil
     @items = []
-    self.navigationItem.title = "Pixiv ManaRitsu Reader"
     self.view.backgroundColor = UIColor.whiteColor
 
-    self.getItems(@feed)
+    searchBar = UISearchBar.alloc.initWithFrame(CGRectMake(0, 0, self.tableView.frame.size.width, 0))
+    searchBar.delegate = self
+    searchBar.showsCancelButton = false
+    searchBar.sizeToFit
+    self.view.dataSource = view.delegate = self
+    self.navigationItem.titleView = searchBar
+    searchBar.text = 'マナりつ'
+
+    self.getItems(@feed, searchBar)
     self.buildRefreshBtn
   end
 
-  def getItems(feed)
-    url = "http://spapi.pixiv.net/iphone/search.php?s_mode=s_tag&word=%E3%83%9E%E3%83%8A%E3%82%8A%E3%81%A4&PHPSESSID=0"
+  def getItems(feed, searchBar)
+    query = searchBar.text.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
+    url = "http://spapi.pixiv.net/iphone/search.php?s_mode=s_tag&word=#{query}&PHPSESSID=0"
     BW::HTTP.get(url) do |response|
       if response.ok?
         @feed = response.body.to_str
