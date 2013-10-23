@@ -7,21 +7,22 @@ class PixivViewController < UITableViewController
     @items = []
     self.view.backgroundColor = UIColor.whiteColor
 
-    searchBar = UISearchBar.alloc.initWithFrame(CGRectMake(0, 0, self.tableView.frame.size.width, 0))
-    searchBar.delegate = self
-    searchBar.showsCancelButton = false
-    searchBar.sizeToFit
+    @searchBar = UISearchBar.alloc.initWithFrame(CGRectMake(0, 0, self.tableView.frame.size.width, 0))
+    @searchBar.delegate = self
+    @searchBar.showsCancelButton = false
+    @searchBar.sizeToFit
     self.view.dataSource = view.delegate = self
-    self.navigationItem.titleView = searchBar
-    searchBar.text = 'マナりつ'
+    self.navigationItem.titleView = @searchBar
+    @searchBar.text = 'マナレジ'
 
-    self.getItems(@feed, searchBar)
+    self.getItems(@feed, @searchBar)
     self.buildRefreshBtn
   end
 
   def getItems(feed, searchBar)
     query = searchBar.text.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
     url = "http://spapi.pixiv.net/iphone/search.php?s_mode=s_tag&word=#{query}&PHPSESSID=0"
+    @items.clear
     BW::HTTP.get(url) do |response|
       if response.ok?
         @feed = response.body.to_str
@@ -95,7 +96,7 @@ class PixivViewController < UITableViewController
 
   # 処理中のイベント
   def eventActivityIndicator
-    self.getItems(@feed)
+    self.getItems(@feed, @searchBar)
 
     # 処理中を、更新ボタンに切り替える
     self.buildRefreshBtn
