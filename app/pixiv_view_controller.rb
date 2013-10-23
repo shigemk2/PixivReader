@@ -7,6 +7,13 @@ class PixivViewController < UITableViewController
     @items = []
     self.view.backgroundColor = UIColor.whiteColor
 
+    @refreshControl = UIRefreshControl.alloc.init
+    # 更新アクションを設定
+    @refreshControl.addTarget(self,
+                             action:"onRefresh",
+                             forControlEvents:UIControlEventValueChanged)
+    self.refreshControl = @refreshControl
+
     @searchBar = UISearchBar.alloc.initWithFrame(CGRectMake(0, 0, 0, 0))
     @searchBar.delegate = self
     @searchBar.showsCancelButton = true
@@ -128,5 +135,16 @@ class PixivViewController < UITableViewController
 
   def searchBarCancelButtonClicked(searchBar)
     searchBar.resignFirstResponder
+  end
+
+  def onRefresh
+    # 更新開始
+    self.refreshControl.beginRefreshing
+
+    view.reloadData
+    self.getItems(@feed, @searchBar)
+
+    # 更新終了
+    self.refreshControl.endRefreshing
   end
 end
