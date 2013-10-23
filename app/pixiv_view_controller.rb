@@ -7,16 +7,18 @@ class PixivViewController < UITableViewController
     @items = []
     self.view.backgroundColor = UIColor.whiteColor
 
-    @searchBar = UISearchBar.alloc.initWithFrame(CGRectMake(0, 0, self.tableView.frame.size.width, 0))
+    @searchBar = UISearchBar.alloc.initWithFrame(CGRectMake(0, 0, 0, 0))
     @searchBar.delegate = self
-    @searchBar.showsCancelButton = false
+    @searchBar.showsCancelButton = true
     @searchBar.sizeToFit
     self.view.dataSource = view.delegate = self
+    # self.view.tableHeaderView = @searchBar
     self.navigationItem.titleView = @searchBar
     @searchBar.text = 'マナレジ'
 
     self.getItems(@feed, @searchBar)
     self.buildRefreshBtn
+    searchBarCancelButtonClicked(@searchBar)
   end
 
   def getItems(feed, searchBar)
@@ -30,6 +32,7 @@ class PixivViewController < UITableViewController
         for row in lines
           @items << row.split(",")
           view.reloadData
+          @searchBar.resignFirstResponder
         end
       else
         App.alert(response.error_message)
@@ -117,5 +120,13 @@ class PixivViewController < UITableViewController
     self.setToolbarItems(arrayWithObjects:"btn", animated:true)
     self.navigationItem.leftBarButtonItem = btn
     self.performSelector("eventActivityIndicator", withObject:nil, afterDelay:0.1)
+  end
+
+  def searchBarSearchButtonClicked(searchBar)
+    self.getItems(@feed, @searchBar)
+  end
+
+  def searchBarCancelButtonClicked(searchBar)
+    searchBar.resignFirstResponder
   end
 end
